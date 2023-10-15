@@ -5,7 +5,7 @@
 #define DISPLAY_RW 1
 #define DISPLAY_EN 2
 
-namespace display {
+namespace displayChar {
     const int16_t CONTOUT[] = { DISPLAY_RS, DISPLAY_RW, DISPLAY_EN, -1 }; //control out pins
     const int16_t DATAOUT[] = {  3,  4,  5,  6,  7,  8,  9, 10 }; //data out pins
 

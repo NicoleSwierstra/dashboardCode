@@ -1,27 +1,27 @@
-#include "display.h"
+#include "displayChar.h"
 #include "Arduino.h"
 
-void display::putData(char data, const int16_t* pins) {
+void displayChar::putData(char data, const int16_t* pins) {
     for(int i = 0; i < 8 && pins[i] > -1; i++) //checks to make sure the pin adress isn't -1
         digitalWrite(pins[i], (data >> 7 - i) & 0x01); //pushes the bit out to the pin
 }
 
-void display::pulseEnable() {
+void displayChar::pulseEnable() {
     digitalWrite(DISPLAY_EN, 1);
     digitalWrite(DISPLAY_EN, 0);
 }
 
-void display::home(){
+void displayChar::home(){
     putData(2, DATAOUT);
     putData(0, CONTOUT);
 }
 
-void display::clear(){
+void displayChar::clear(){
     putData(1, DATAOUT);
     putData(0, CONTOUT);
 }
 
-void display::initDisplay(){
+void displayChar::initDisplay(){
     //output block
     pinMode(DISPLAY_RS, OUTPUT);
     pinMode(DISPLAY_RW, OUTPUT);
@@ -49,12 +49,12 @@ void display::initDisplay(){
     pulseEnable();
 }
 
-void display::putChar(char c){
+void displayChar::putChar(char c){
     putData(c, DATAOUT);
     putData(0b10100000, CONTOUT);
 }
 
-void display::printString(char* cstr){
+void displayChar::printString(char* cstr){
     for(int i = 0; cstr[i] != 0; i++){
         putChar(cstr[i]);
     }
