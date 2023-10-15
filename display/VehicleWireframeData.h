@@ -1,8 +1,6 @@
 #pragma once
 
-namespace display {
-    const int WIDTH = 128, HEIGHT = 64;
-
+namespace VehicleWireframeData3D {
     double vehiclepoints[158][3] = {
         {0.7, 0.0, 0.7},
         {1.0, 0.0, -1.0},
@@ -442,4 +440,4 @@ namespace display {
         {90, 83},
         {93, 92},
     };
-}
+};
