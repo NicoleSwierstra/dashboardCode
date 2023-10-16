@@ -7,8 +7,8 @@ void displayChar::putData(char data, const int16_t* pins) {
 }
 
 void displayChar::pulseEnable() {
-    digitalWrite(DISPLAY_EN, 1);
-    digitalWrite(DISPLAY_EN, 0);
+    digitalWrite(DISPLAY_CHAR_EN, 1);
+    digitalWrite(DISPLAY_CHAR_EN, 0);
 }
 
 void displayChar::home(){
@@ -23,9 +23,9 @@ void displayChar::clear(){
 
 void displayChar::initDisplay(){
     //output block
-    pinMode(DISPLAY_RS, OUTPUT);
-    pinMode(DISPLAY_RW, OUTPUT);
-    pinMode(DISPLAY_EN, OUTPUT);
+    pinMode(DISPLAY_CHAR_RS, OUTPUT);
+    pinMode(DISPLAY_CHAR_RW, OUTPUT);
+    pinMode(DISPLAY_CHAR_EN, OUTPUT);
     for(int i = 0; i < 8; i++)
         pinMode(DATAOUT[i], OUTPUT);
 

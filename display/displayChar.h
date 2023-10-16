@@ -1,12 +1,12 @@
 #pragma once
 
 //these are placeholders
-#define DISPLAY_RS 0
-#define DISPLAY_RW 1
-#define DISPLAY_EN 2
+#define DISPLAY_CHAR_RS 0
+#define DISPLAY_CHAR_RW 1
+#define DISPLAY_CHAR_EN 2
 
 namespace displayChar {
-    const int16_t CONTOUT[] = { DISPLAY_RS, DISPLAY_RW, DISPLAY_EN, -1 }; //control out pins
+    const int16_t CONTOUT[] = { DISPLAY_CHAR_RS, DISPLAY_CHAR_RW, DISPLAY_CHAR_EN, -1 }; //control out pins
     const int16_t DATAOUT[] = {  3,  4,  5,  6,  7,  8,  9, 10 }; //data out pins
 
     /**
