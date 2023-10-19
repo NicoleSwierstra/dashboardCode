@@ -40,7 +40,7 @@ typedef uint8_t     MC_Byte;
 #define MC_CANID_INTERNALSTATES            0x0AA
 #define MC_CANID_FAULTCODES                0x0AB
 #define MC_CANID_TORQUETIMER               0x0AC
-#define MC_CANID_MISCDONTASK               0x0AD
+#define MC_CANID_MIANDFLUXWEAKENINGINFO    0x0AD
 #define MC_CANID_FIRMWAREINFO              0x0AE
 #define MC_CANID_DIAGNOSTIC                0x0AF
 
@@ -233,16 +233,22 @@ struct MC_TorqueTimer {
     MC_Time32           powerOnTimer;
 };
 
-struct MC_dontKnowDontCare {
-
+struct MC_MIandFluxWeakeningInfo {
+    MC_UnsignedInt      modulationIndex;
+    MC_Current          fluxWeakening;
+    MC_Current          ldCommand;
+    MC_Current          lqCommand;
 };
 
 struct MC_FirmwareInfo {
-
+    MC_UnsignedInt      version;
+    MC_UnsignedInt      softwareVersion;
+    MC_UnsignedInt      dateCodeMMDD;
+    MC_UnsignedInt      dateCodeYYYY;
 }; 
 
 struct MC_Diagnostic {
-
+    uint32_t a, b;
 }; 
 
 struct MC_HighSpeed {
