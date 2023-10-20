@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 //was written to be used by https://www.crystalfontz.com/product/cfag12864istitn-128x64-graphical-display-module-lcd
 namespace display {
@@ -8,11 +9,9 @@ namespace display {
     struct buffer {
         uint8_t seg1[HEIGHT][WIDTH/16] = {{0}};
         uint8_t seg2[HEIGHT][WIDTH/16] = {{0}};
-    } 
-    //the active buffer, written to
-    *_active,
-    //the drawing bufer, used to draw
-    *_drawing;
+    };
+    
+    extern buffer *_active, *_drawing;
 
     /**
      * @brief inits the display

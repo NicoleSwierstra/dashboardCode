@@ -29,7 +29,7 @@ for glyph in range(0, 128):
             pixely = py68 + (9 * glyphy)
             charsnd68[glyph][py68] += str(1 if ndFont[pixely][pixelx][0] == 0 else 0)
 
-with open('display/Fonts.h', 'wt') as f:
+with open('src/display/Fonts.h', 'wt') as f:
     f.write('#pragma once\n')
     f.write('namespace fonts {\n')
     f.write('    uint8_t text5by7MC[128][8] = {\n')
@@ -43,7 +43,7 @@ with open('display/Fonts.h', 'wt') as f:
     for _i, i in enumerate(charsnd68):
         f.write('        { ')
         for j in i:
-            f.write(j + '00, ')
+            f.write(j + '0, ')
         f.write('}, /* ' + charnames[_i] + ' */ \n')
     f.write('    };\n\n')
     f.write('}')
