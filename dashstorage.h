@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 #define DASH_HP_MAX_ERRORS 16
 #define DASH_LP_MAX_ERRORS 31
 
@@ -17,8 +18,8 @@ namespace dashstorage {
     } driverscreen {0, 0, 0};
 
     struct errorScreen {
-        const uint16_t errortype;
-        const uint16_t errormessage;
+        uint16_t errortype;
+        uint16_t errormessage;
     } hpErrorScreenStack[DASH_HP_MAX_ERRORS], lpErrorScreenStack[DASH_LP_MAX_ERRORS];
 
     uint8_t lpErrorScreen = 0, hpErrorScreen = 0; //number of errors displayed on screens.

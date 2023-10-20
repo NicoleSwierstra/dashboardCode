@@ -1,5 +1,6 @@
 #include "dashstorage.h"
 
-bool dashstorage::pushBackError(){
-    //push back to start
+bool dashstorage::pushBackError(bool highPriority, errorScreen er){
+    return 0;
+    //!TODO: this
 }
