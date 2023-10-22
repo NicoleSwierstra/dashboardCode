@@ -1,28 +1,33 @@
 #pragma once
 #include <stdint.h>
 #define DASH_HP_MAX_ERRORS 16
-#define DASH_LP_MAX_ERRORS 31
+#define DASH_LP_MAX_ERRORS 32
 
-namespace dashstorage {
-    volatile struct datastruct {
+namespace DashStorage {
+    struct _DataStruct {
         //MCU TEMP
         //BATTERY VOLTAGE
         //BATTERY TEMPURTURE
         //MOTOR TEMP
-    } dashData {};
+    } extern dataStruct;
 
-    struct driverScreen {
+    struct _DriverScreen {
         uint32_t lapsOnCurrentCharge;
         uint32_t lapTimeMS;
         uint32_t lapTimeDeltaMS;
-    } driverscreen {0, 0, 0};
+    } extern driverScreen;
 
-    struct errorScreen {
-        uint16_t errortype;
-        uint16_t errormessage;
-    } hpErrorScreenStack[DASH_HP_MAX_ERRORS], lpErrorScreenStack[DASH_LP_MAX_ERRORS];
+    struct _DashError { 
+        char id[20];
+        const char* errorPointer = 0;
+    };
 
-    uint8_t lpErrorScreen = 0, hpErrorScreen = 0; //number of errors displayed on screens.
+    struct _ErrorStack {
+        _DashError hpErrorStack[DASH_HP_MAX_ERRORS];
+        _DashError lpErrorStack[DASH_LP_MAX_ERRORS];
+        uint8_t lpErrorPointer = 0, hpErrorPointer = 0;
+        bool lpfull, hpfull;
+    } extern errorStacks;
 
     /**
      * @brief pushes a new error onto error screen stack
@@ -31,5 +36,5 @@ namespace dashstorage {
      * @param er the error screen to be pushed back
      * @return true if error pushed back pops an error off the back of the array, otherwise false
      */
-    bool pushBackError(bool highPriority, errorScreen er);
+    void pushBackError(bool highPriority, const char* id, const char* err);
 }

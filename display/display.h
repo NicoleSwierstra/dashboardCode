@@ -50,4 +50,6 @@ namespace display {
      * Lastest version at http://www.edepot.com/phl.html
      */ 
     void drawLine(int x1, int y1, int x2, int y2);
+
+    void debugDrawToSerial();
 }
