@@ -9,10 +9,9 @@ void setup() {
         for(int j = 0; j < s.length(); j++){
             int bit = 0;
             while(++bit < 8){
-                bool b = fonts::text5by7MC[s[j]][i] >> (9 - bit) & 0x01;
+                bool b = fonts::text6by8ND[s[j]][i] >> (9 - bit) & 0x01;
                 Serial.print(b ? ' ' : '0');
             }
-           
         }
         Serial.println();
     }

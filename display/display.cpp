@@ -4,7 +4,7 @@
 display::buffer *display::_active, *display::_drawing;
 
 void display::setPixel(int x, int y, uint8_t value){
-    (x < WIDTH/16) ? _active->seg1[y][x] = value : _active->seg2[y][x] = value;
+    (x < WIDTH/16) ? _active->seg1[y][x] = value : _active->seg2[y][(x - WIDTH/16)] = value;
 }
 
 void display::init(){
