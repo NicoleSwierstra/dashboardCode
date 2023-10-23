@@ -3,44 +3,59 @@
 #include "dashstorage.h"
 #include <Time.h>
 #include <FlexCAN_T4.h>
+#include "display/VehicleWireframeData.h"
 
-FlexCAN_T4<CAN0, RX_SIZE_256, TX_SIZE_16> Can0;
+//FlexCAN_T4<CAN0, RX_SIZE_256, TX_SIZE_16> Can0;
+
+void display::debugDrawToSerial(){
+	for(int y = 0; y < HEIGHT; y += 2) {
+		for(int x = 0; x < 8; x++) {
+			std::string s = "";
+			uint8_t c0 = _display->seg1[y][x], c1 = _display->seg1[y+1][x];
+			for(int i = 0; i < 8; i++){
+				int p = (((c1 >> i) & 0x01) * 2) + ((c0 >> i) & 0x01);
+				switch(p){
+					case 3: s += "█"; break;
+					case 2: s += "▄"; break;
+					case 1: s += "▀"; break;
+					case 0: s += " "; break;
+				}
+			}
+            Serial.print(s.c_str());
+		}
+        for(int x = 0; x < 8; x++) {
+			std::string s = "";
+			uint8_t c0 = _display->seg2[y][x], c1 = _display->seg2[y+1][x];
+			for(int i = 0; i < 8; i++){
+				int p = (((c1 >> i) & 0x01) * 2) + ((c0 >> i) & 0x01);
+				switch(p){
+					case 3: s += "█"; break;
+					case 2: s += "▄"; break;
+					case 1: s += "▀"; break;
+					case 0: s += " "; break;
+				}
+			}
+            Serial.print(s.c_str());
+		}
+        Serial.println();
+	}
+}
 
 void setup(void) {
-    Serial.begin(115200); delay(400);
+    Serial.begin(9600); delay(400);
     Serial.println("HELLO WORLD! ");
-    pinMode(6, OUTPUT); digitalWrite(6, LOW); /* optional tranceiver enable pin */
-    Can0.begin();
-    Can0.setBaudRate(1000000);
-    Can0.setMaxMB(16);
-    Can0.enableFIFO();
-    Can0.enableFIFOInterrupt();
-    Can0.onReceive(canSniff);
-    Can0.mailboxStatus();
+    display::init();
+    Serial.println();
 }
 
-void canSniff(const CAN_message_t &msg) {
-    Serial.print("MB "); Serial.print(msg.mb);
-    Serial.print("  OVERRUN: "); Serial.print(msg.flags.overrun);
-    Serial.print("  LEN: "); Serial.print(msg.len);
-    Serial.print(" EXT: "); Serial.print(msg.flags.extended);
-    Serial.print(" TS: "); Serial.print(msg.timestamp);
-    Serial.print(" ID: "); Serial.print(msg.id, HEX);
-    Serial.print(" Buffer: ");
-    for ( uint8_t i = 0; i < msg.len; i++ ) {
-        Serial.print(msg.buf[i], HEX); Serial.print(" ");
-    } Serial.println();
-}
+int i = 0;
 
 void loop() {
-    Can0.events();
+    display::clearBuffer();
+	display::renderCar(0.1 * i);
+    display::swapBuffers();
 
-    static uint32_t timeout = millis();
-    if ( millis() - timeout > 200 ) {
-        CAN_message_t msg;
-        msg.id = random(0x1, 0x7FE);
-        for ( uint8_t i = 0; i < 8; i++ ) msg.buf[i] = i + 1;
-        Can0.write(msg);
-        timeout = millis();
-    }
+    display::debugDrawToSerial();
+	i++;
+	delay(300);
 }

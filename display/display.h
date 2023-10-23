@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <string>
 
 //was written to be used by https://www.crystalfontz.com/product/cfag12864istitn-128x64-graphical-display-module-lcd
 namespace display {
@@ -11,7 +12,7 @@ namespace display {
         uint8_t seg2[HEIGHT][WIDTH/16] = {{0}};
     };
     
-    extern buffer *_active, *_drawing;
+    extern buffer *_active, *_display;
 
     /**
      * @brief inits the display
@@ -35,7 +36,7 @@ namespace display {
      * @param value the value to write
      * @param buffer the buffer to write to
      */
-    void setPixel(int x, int y, uint8_t value);
+    void setPixel(int x, int y);
 
     /*
      * Extremely Fast Line Algorithm Var D (Addition Fixed Point)
@@ -50,6 +51,9 @@ namespace display {
      * Lastest version at http://www.edepot.com/phl.html
      */ 
     void drawLine(int x1, int y1, int x2, int y2);
+    void drawText(int x, int y, int font, const char* text);
+
+    void renderCar(double rot);
 
     void debugDrawToSerial();
 }

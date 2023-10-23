@@ -56,7 +56,7 @@ typedef uint8_t     MC_Byte;
   (((data) <<  8) & 0x000000FF00000000) | (((data) << 24) & 0x0000FF0000000000) | \
   (((data) << 40) & 0x00FF000000000000) | (((data) << 56) & 0xFF00000000000000) ) 
 
-const char* MC_Post_Errors[32] = {
+constexpr const char* MC_Post_Errors[32] = {
     //0
     "Hardware Gate/Desaturation Fault",
     "Hardware Overcurrent Fault",
@@ -95,7 +95,7 @@ const char* MC_Post_Errors[32] = {
     "Brake Open"
 };
 
-const char* MC_Run_Errors[32] = {
+constexpr const char* MC_Run_Errors[32] = {
     //4
     "Motor Overspeed Fault",
     "Over-Current Fault",

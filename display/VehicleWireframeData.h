@@ -1,7 +1,7 @@
 #pragma once
 
 namespace VehicleWireframeData3D {
-    double vehiclepoints[158][3] = {
+    constexpr double vehiclepoints[158][3] = {
         {0.7, 0.0, 0.7},
         {1.0, 0.0, -1.0},
         {0.9, 0.0, -3.0},
@@ -162,7 +162,7 @@ namespace VehicleWireframeData3D {
         {-1.706254, 0.561153, -2.680014},
     };
 
-    const int vehiclepairs[276][2] = {
+    constexpr int vehiclepairs[276][2] = {
         {1, 2},
         {5, 6},
         {10, 1},
