@@ -102,7 +102,7 @@ void transformToScreen(const double * _in, double a, int * out){
 void display::renderCar(double rot) {
 	static int points[2] = {0, 0};
 	static int points2[2] = {0, 0};
-	for(int i = 0; i < 276; i++){
+	for(int i = 0; i < 250; i++){
 		auto pairs = VehicleWireframeData3D::vehiclepairs[i];
 		transformToScreen(VehicleWireframeData3D::vehiclepoints[pairs[0] - 1], rot, points);
 		transformToScreen(VehicleWireframeData3D::vehiclepoints[pairs[1] - 1], rot, points2);
