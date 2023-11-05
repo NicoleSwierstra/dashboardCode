@@ -38,6 +38,8 @@ int frameNumber = 0;
 
 bool RTD = false;
 
+uint32_t    buttonCheckTime = 0;
+
 uint32_t    dtime = 200;
 uint32_t    lapstart = 0;
 int32_t     lapdelta = 0;
@@ -86,7 +88,7 @@ void loop() {
         display::clearBuffer();
 	
         if(!RTD) {
-            display::renderCar(0.2 * frameNumber);
+            display::renderCar(0.1 * frameNumber);
             display::drawText(  0,  0,  0, "ROTATES YOUR CAR");
             display::drawText( 23, 55,  0, "BOTTOM TEXT");
         }
@@ -102,12 +104,16 @@ void loop() {
             display::drawText( 70,  9,  0, "BATTERY");
         }
 
+        Serial.print(millis() - dtime);
+        Serial.print(' ');
         display::swapBuffers();
-        dtime = millis() + 100;
+        Serial.println(millis() - dtime);
+        dtime = millis() + 150;
         frameNumber++;
     }
 
-    button::updateButtons();
-
-    delay(10); //fixes jitter in the buttons
+    if(millis() >= buttonCheckTime) { //fixes jitter
+        button::updateButtons();
+        buttonCheckTime = millis() + 20;
+    }
 }

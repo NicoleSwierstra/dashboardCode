@@ -145,7 +145,7 @@ void display::swapBuffers(){
 	digitalWrite(DISPLAY_PIN_RS, 		1);
 	
 	for(int y = 0; y < 8; y++) {
-		delayMicroseconds(8);
+		delayMicroseconds(5);
 
 		//Select page of display
 		digitalWrite(DISPLAY_PIN_RS, 0);
@@ -254,20 +254,36 @@ void display::drawText(int xoff, int yoff, int font, const char* text){
 		
 }
 
-void transformToScreen(const double * _in, double a, int * out){
+const int widthoff = display::WIDTH/2, heightoff = display::HEIGHT/2 + 15; //don'tcha just love optimization
+
+void transformToScreen(const double * _in, double sina, double cosa, int * out){
     double x = _in[0], y = _in[1], z = _in[2];
-    out[0] = -(int)(x * 15 * sin(a)) - (int)(z * 15 * cos(a)) + display::WIDTH/2;
-    out[1] = -(int)(y *  13) + (int)(x * 3 * cos(a)) - (int)(z * 3 * sin(a)) + (display::HEIGHT/2 + 15);
+    out[0] = -(int)(x * 15 * sina) - (int)(z * 15 * cosa) + widthoff;
+    out[1] = -(int)(y *  13) + (int)(x * 3 * cosa) - (int)(z * 3 * sina) + heightoff;
 }
 
+int vehiclePointsTransformedBuffer[169][2] = {{0, 0}}; //optimization baybeee
+
 void display::renderCar(double rot) {
-	static int points[2] = {0, 0};
-	static int points2[2] = {0, 0};
+	double rotcorrect = fmod(rot, PI*2);
+	double sina = sin(rotcorrect), 
+		   cosa = cos(rotcorrect);
+	for(int i = 0; i < 169; i++){
+		transformToScreen(
+			VehicleWireframeData3D::vehiclepoints[i], 
+			sina, 
+			cosa,
+			vehiclePointsTransformedBuffer[i]
+		);
+	}
 	for(int i = 0; i < 250; i++){
 		auto pairs = VehicleWireframeData3D::vehiclepairs[i];
-		transformToScreen(VehicleWireframeData3D::vehiclepoints[pairs[0] - 1], rot, points);
-		transformToScreen(VehicleWireframeData3D::vehiclepoints[pairs[1] - 1], rot, points2);
-		drawLine(points[0], points[1], points2[0], points2[1]);
+		drawLine(
+			vehiclePointsTransformedBuffer[pairs[0] - 1][0],
+			vehiclePointsTransformedBuffer[pairs[0] - 1][1],
+			vehiclePointsTransformedBuffer[pairs[1] - 1][0],
+			vehiclePointsTransformedBuffer[pairs[1] - 1][1]
+		);
 	}
 }
 
