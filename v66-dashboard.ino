@@ -104,10 +104,10 @@ void loop() {
             display::drawText( 70,  9,  0, "BATTERY");
         }
 
-        Serial.print(millis() - dtime);
-        Serial.print(' ');
+        //Serial.print(millis() - dtime);
+        //Serial.print(' ');
         display::swapBuffers();
-        Serial.println(millis() - dtime);
+        //Serial.println(millis() - dtime);
         dtime = millis() + 150;
         frameNumber++;
     }

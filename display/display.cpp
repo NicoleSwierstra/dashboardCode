@@ -77,21 +77,28 @@ void waitUntilNotBusy(int n){
 	portDpinMode(OUTPUT);
 }
 
-void printStatus() {
+
+uint8_t getStatus() {
 	portDpinMode(INPUT);
 
 	digitalWrite(DISPLAY_PIN_RS, 0);
 	digitalWrite(DISPLAY_PIN_RW, 1);
 	digitalWrite(DISPLAY_PIN_ENABLE,	1);
 
-	delayMicroseconds(1);
+	delayMicroseconds(2);
 
-	Serial.print("Status Check: ");
-	Serial.println(readPortD(), BIN);
+	uint8_t status = readPortD();
 
 	digitalWrite(DISPLAY_PIN_ENABLE,	0);
 
 	portDpinMode(OUTPUT);
+
+	return status;
+}
+
+void printStatus(){
+	Serial.print("Status Check: ");
+	Serial.println(getStatus(), BIN);
 }
 
 void display::init(){
@@ -114,14 +121,14 @@ void display::init(){
 
 	digitalWrite(DISPLAY_PIN_RESET, 	1);
 	flashEnable();
-	
+
 	waitUntilNotBusy(0);
 	delay(1);
 	digitalWrite(DISPLAY_PIN_RS, 		0);
 	digitalWrite(DISPLAY_PIN_RW, 		0);
 	writePortD(0b00111111);
 	flashEnable();
-
+	
 	printStatus();
 }
 
@@ -129,8 +136,6 @@ void display::swapBuffers(){
 	buffer* tmp = _display;
 	_display = _active;
 	_active = tmp;
-
-	//printStatus();
 
 	digitalWrite(DISPLAY_PIN_RS, 		0);
 	digitalWrite(DISPLAY_PIN_RW, 		0);
