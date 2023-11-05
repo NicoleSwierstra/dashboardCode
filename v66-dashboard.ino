@@ -1,6 +1,7 @@
 #include "display/Fonts.h"
 #include "display/display.h"
 #include "dashstorage.h"
+#include "input/button.h"
 #include <Time.h>
 #include <FlexCAN_T4.h>
 
@@ -8,6 +9,9 @@
 
 #define PIN_RTD 24
 
+
+void buttonFuncRTD();
+void buttonFuncLap();
 
 void setup(void) {
     Serial.begin(9600); delay(400);
@@ -21,35 +25,38 @@ void setup(void) {
     digitalWrite(0, 0);
     digitalWrite(1, 0);
 
-    pinMode(11, INPUT);
-    digitalWrite(11, HIGH);
-    pinMode(12, INPUT);
-    digitalWrite(12, HIGH);
-    pinMode(PIN_RTD, INPUT);
-    digitalWrite(PIN_RTD, HIGH);
-
-    pinMode(0, 1);
-    pinMode(1, 1);
-    digitalWrite(1, 1);
+    button::addButton( PIN_RTD, &buttonFuncRTD, nullptr, true);
+    button::addButton(      11, &buttonFuncLap, nullptr, false);
 
     pinMode(16, 1);
-    pinMode(17, 1);
-    pinMode(18, 1);
+    pinMode(17, 0);
+    pinMode(18, 0);
     pinMode(19, 1);
 }
 
 int frameNumber = 0;
 
 bool RTD = false;
-bool rtdbuffer = true;
-bool pin12buffer = true;
-
 
 uint32_t    dtime = 200;
 uint32_t    lapstart = 0;
 int32_t     lapdelta = 0;
 uint32_t    lastlap = 0;
 char        timestr[9];
+
+void buttonFuncRTD(){
+    RTD = !RTD;
+    digitalWrite(0,  RTD);
+    digitalWrite(1, !RTD);
+}
+
+void buttonFuncLap(){
+    uint32_t t = millis();
+    int32_t laptime = t - lapstart;
+    lapdelta = laptime - lastlap;
+    lapstart = t;
+    lastlap = laptime;
+}
 
 void getTimeStrFrom(int32_t ms, bool addsign) {
     int cen = (abs(ms) % 1000) / 10;
@@ -75,26 +82,6 @@ void getTimeStrFrom(int32_t ms, bool addsign) {
 }
 
 void loop() {
-
-    if(!digitalRead(PIN_RTD) && rtdbuffer){
-        RTD = !RTD;
-        digitalWrite(0,  RTD);
-        digitalWrite(1, !RTD);
-        rtdbuffer = false;
-    }
-    else if(digitalRead(PIN_RTD))
-        rtdbuffer = true;
-    if(digitalRead(12) && pin12buffer){
-        uint32_t t = millis();
-        int32_t laptime = t - lapstart;
-        lapdelta = laptime - lastlap;
-        lapstart = t;
-        lastlap = laptime;
-        pin12buffer = false;
-    }
-    else if(!digitalRead(12))
-        pin12buffer = true;
-    
     if (millis() > dtime) {
         display::clearBuffer();
 	
@@ -119,6 +106,8 @@ void loop() {
         dtime = millis() + 100;
         frameNumber++;
     }
+
+    button::updateButtons();
 
     delay(10); //fixes jitter in the buttons
 }
