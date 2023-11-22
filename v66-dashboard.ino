@@ -5,33 +5,47 @@
 #include <Time.h>
 #include <FlexCAN_T4.h>
 
-//FlexCAN_T4<CAN0, RX_SIZE_256, TX_SIZE_16> Can0;
+FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can0;
 
-#define PIN_RTD 24
+#define PIN_LED_LC          0x10
+#define PIN_LED_FAULT       0x11
+#define PIN_RTD_LIGHT_B     0x0F
+#define PIN_RTD_LIGHT_G     0x12
+#define PIN_RTD_LIGHT_R     0x13
 
+#define PIN_AUDIO_LRCLK1    0x14
+#define PIN_AUDIO_BCLK1     0x15
+#define PIN_AUDIO_OUT1B     0x20
+
+#define PIN_CAN_RX          0x16
+#define PIN_CAN_TX          0x17
+
+#define PIN_LCD_DIMMER_POT  0x18
+#define PIN_LED_DIMMER_PWM  0x0E
+#define PIN_LCD_DIMMER_PWM  0x21
+#define PIN_LED_DIMMER_POT  0x1A
+
+#define PIN_BUTTON_N0       0x19
+#define PIN_BUTTON_N1       0x1B
+#define PIN_BUTTON_N2       0x1D
+#define PIN_BUTTON_PAGE     0x1F
+
+#define PIN_IMD_MONITOR     0x1C
+#define PIN_AMS_MONITOR     0x1E
 
 void buttonFuncRTD();
 void buttonFuncLap();
 
 void setup(void) {
     Serial.begin(9600); delay(400);
-    Serial.println("HELLO WORLD! ");
     delay(10);
     display::init();
     Serial.println();
 
-    pinMode(0, 1);
-    pinMode(1, 1);
-    digitalWrite(0, 0);
-    digitalWrite(1, 0);
+    pinMode(PIN_BUTTON_PAGE, OUTPUT);
 
-    button::addButton( PIN_RTD, &buttonFuncRTD, nullptr, true);
-    button::addButton(      11, &buttonFuncLap, nullptr, false);
-
-    pinMode(16, 1);
-    pinMode(17, 0);
-    pinMode(18, 0);
-    pinMode(19, 1);
+    button::addButton( PIN_BUTTON_N0, &buttonFuncRTD, nullptr, true);
+    button::addButton( PIN_BUTTON_N1, &buttonFuncLap, nullptr, false);
 }
 
 int frameNumber = 0;
@@ -44,7 +58,6 @@ uint32_t    dtime = 200;
 uint32_t    lapstart = 0;
 int32_t     lapdelta = 0;
 uint32_t    lastlap = 0;
-char        timestr[9];
 
 void buttonFuncRTD(){
     RTD = !RTD;
@@ -60,7 +73,9 @@ void buttonFuncLap(){
     lastlap = laptime;
 }
 
-void getTimeStrFrom(int32_t ms, bool addsign) {
+char* getTimeStrFrom(int32_t ms, bool addsign) {
+    static char timestr[9];
+
     int cen = (abs(ms) % 1000) / 10;
     int sec = (abs(ms) / 1000) % 60;
     int min =((abs(ms) / 1000) % 3600) / 60;
@@ -81,6 +96,7 @@ void getTimeStrFrom(int32_t ms, bool addsign) {
     timestr[8] = '\0';
 
     if(addsign) timestr[0] = (ms > 0) ? '+' : '-';
+    return timestr;
 }
 
 void loop() {
@@ -94,20 +110,18 @@ void loop() {
         }
         else {
             display::drawText(  4,  0,  0, "LAPTIME");
-            getTimeStrFrom(dtime - lapstart, 0);
-            display::drawText(  6, 12,  1, timestr);
-            getTimeStrFrom(lapdelta, 1);
-            display::drawText(  6, 21,  1, timestr);
+            display::drawText(  6, 12,  1, getTimeStrFrom(dtime - lapstart, 0));
+            display::drawText(  6, 21,  1, getTimeStrFrom(lapdelta, 1));
             display::drawLine( 62,  0, 62, 30);
             display::drawLine(  0, 30, 62, 30);
             display::drawText( 70,  0,  0, "LAPS ON");
             display::drawText( 70,  9,  0, "BATTERY");
         }
 
-        //Serial.print(millis() - dtime);
-        //Serial.print(' ');
+        Serial.print(millis() - dtime);
+        Serial.print(' ');
         display::swapBuffers();
-        //Serial.println(millis() - dtime);
+        Serial.println(millis() - dtime);
         dtime = millis() + 150;
         frameNumber++;
     }

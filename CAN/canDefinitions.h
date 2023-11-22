@@ -12,7 +12,7 @@ typedef int16_t     MC_Torque;
 typedef int16_t     MC_HighVoltage;
 typedef int16_t     MC_Current;
 typedef int16_t     MC_Angle;
-typedef int16_t     MC_AngularVelocity;
+typedef int16_t     MC_AngularVelocity; 
 typedef int8_t      MC_Boolean;
 typedef int16_t     MC_Frequency;
 typedef int16_t     MC_Time16;

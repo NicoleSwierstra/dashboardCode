@@ -61,37 +61,34 @@ void waitUntilNotBusy(int n){
 
 	digitalWrite(DISPLAY_PIN_RS, 0);
 	digitalWrite(DISPLAY_PIN_RW, 1);
+	digitalWrite(DISPLAY_PIN_ENABLE,	1);
+	delayNanoseconds(1500);
 
-	bool isBusy = true;
-	int i = 0;
-	while(isBusy && i < n){
-		digitalWrite(DISPLAY_PIN_ENABLE,	1);
+	while(digitalRead(5));
 
-		delayMicroseconds(1);
-		isBusy = digitalRead(5);
-
-		digitalWrite(DISPLAY_PIN_ENABLE,	0);
-		delayNanoseconds(100);
-		i++;
-	}
+	digitalWrite(DISPLAY_PIN_ENABLE,	0);
 	portDpinMode(OUTPUT);
+
+	delay(5);
+
 }
 
 
 uint8_t getStatus() {
 	portDpinMode(INPUT);
 
-	digitalWrite(DISPLAY_PIN_RS, 0);
-	digitalWrite(DISPLAY_PIN_RW, 1);
-	digitalWrite(DISPLAY_PIN_ENABLE,	1);
-
-	delayMicroseconds(2);
+	digitalWrite(PIN_DISPLAY_RS, 0);
+	digitalWrite(PIN_DISPLAY_RW, 1);
+	digitalWrite(PIN_DISPLAY_EN, 1);
+	delay(1);
 
 	uint8_t status = readPortD();
 
-	digitalWrite(DISPLAY_PIN_ENABLE,	0);
+	digitalWrite(PIN_DISPLAY_EN, 0);
 
 	portDpinMode(OUTPUT);
+
+	delay(100);
 
 	return status;
 }
@@ -105,31 +102,28 @@ void display::init(){
 	_active = new buffer();
 	_display = new buffer();
 
-	pinMode(DISPLAY_PIN_RS,		1);
-	pinMode(DISPLAY_PIN_RW,		1);
-	pinMode(DISPLAY_PIN_ENABLE,	1);
-	pinMode(DISPLAY_PIN_RESET,	1);
-	pinMode(DISPLAY_PIN_CS1,	1);
-	pinMode(DISPLAY_PIN_CS2,	1);
-
+	pinMode(PIN_DISPLAY_RS,		1);
+	pinMode(PIN_DISPLAY_RW,		1);
+	pinMode(PIN_DISPLAY_EN,		1);
+	pinMode(PIN_DISPLAY_RESET,	1);
 	portDpinMode(OUTPUT);
 
-	writePortD(0b00000000);
-
-	digitalWrite(DISPLAY_PIN_CS1, 		1);
-	digitalWrite(DISPLAY_PIN_CS2, 		1);
-
 	digitalWrite(DISPLAY_PIN_RESET, 	1);
-	flashEnable();
+
+	delay(1000);
+	digitalWrite(PIN_DISPLAY_RW, 		0);
+	digitalWrite(PIN_DISPLAY_RS, 		1);
+	digitalWrite(PIN_DISPLAY_CS1, 		1);
+	digitalWrite(PIN_DISPLAY_CS2, 		1);
+	delay(10);
 
 	waitUntilNotBusy(0);
-	delay(1);
-	digitalWrite(DISPLAY_PIN_RS, 		0);
-	digitalWrite(DISPLAY_PIN_RW, 		0);
-	writePortD(0b00111111);
+	writePortD(0x3f);
+	delay(5);
 	flashEnable();
-	
+	Serial.print("a: ");
 	printStatus();
+	delay(10);
 }
 
 void display::swapBuffers(){
@@ -137,42 +131,54 @@ void display::swapBuffers(){
 	_display = _active;
 	_active = tmp;
 
-	digitalWrite(DISPLAY_PIN_RS, 		0);
-	digitalWrite(DISPLAY_PIN_RW, 		0);
-	digitalWrite(DISPLAY_PIN_ENABLE, 	0);
-	digitalWrite(DISPLAY_PIN_CS2, 		1);
-	digitalWrite(DISPLAY_PIN_CS1, 		1);
+	digitalWrite(PIN_DISPLAY_RS, 		0);
+	digitalWrite(PIN_DISPLAY_RW, 		0);
+	digitalWrite(PIN_DISPLAY_CS1, 		1);
+	digitalWrite(PIN_DISPLAY_CS2, 		1);
 	delayMicroseconds(5);
 	writePortD(0b01000000);
 	flashEnable();
+	writePortD(0b00111111);
+	flashEnable();
 	delayMicroseconds(1);
-
-	digitalWrite(DISPLAY_PIN_RS, 		1);
 	
+	digitalWrite(PIN_DISPLAY_CS2, 0);
 	for(int y = 0; y < 8; y++) {
 		delayMicroseconds(5);
 
 		//Select page of display
-		digitalWrite(DISPLAY_PIN_RS, 0);
+		digitalWrite(PIN_DISPLAY_RS, 0);
 		writePortD(0b10111000 | y);
+		waitUntilNotBusy(10);
 		flashEnable();
-		digitalWrite(DISPLAY_PIN_RS, 1);
-		delayMicroseconds(1);
+		digitalWrite(PIN_DISPLAY_RS, 1);
+		delayMicroseconds(10);
 
 		for(int x = 0; x < WIDTH / 2; x++) {
-			digitalWrite(DISPLAY_PIN_CS2, 0);
-			delayMicroseconds(3);
-
+			delayMicroseconds(2);
 			writePortD(_display->seg1[y][x]);
 			flashEnable();
+		}
+	}
+	digitalWrite(PIN_DISPLAY_CS2, 1);
+	digitalWrite(PIN_DISPLAY_CS1, 0);
 
-			digitalWrite(DISPLAY_PIN_CS1, 0);
-			digitalWrite(DISPLAY_PIN_CS2, 1);
-			delayMicroseconds(3);
+	for(int y = 0; y < 8; y++) {
+		delayMicroseconds(5);
 
+		//Select page of display
+		digitalWrite(PIN_DISPLAY_RS, 0);
+		delayMicroseconds(10);
+		writePortD(0b10111000 | y);
+		waitUntilNotBusy(10);
+		flashEnable();
+		digitalWrite(PIN_DISPLAY_RS, 1);
+		delayMicroseconds(10);
+
+		for(int x = 0; x < WIDTH / 2; x++) {
+			delayMicroseconds(2);
 			writePortD(_display->seg2[y][x]);
 			flashEnable();
-			digitalWrite(DISPLAY_PIN_CS1, 1);
 		}
 	}
 }
@@ -259,7 +265,7 @@ void display::drawText(int xoff, int yoff, int font, const char* text){
 		
 }
 
-const int widthoff = display::WIDTH/2, heightoff = display::HEIGHT/2 + 15; //don'tcha just love optimization
+constexpr int widthoff = display::WIDTH/2, heightoff = display::HEIGHT/2 + 15; //don'tcha just love optimization
 
 void transformToScreen(const double * _in, double sina, double cosa, int * out){
     double x = _in[0], y = _in[1], z = _in[2];
